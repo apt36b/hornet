@@ -1,3 +1,9 @@
+# Python cache
 __pycache__
+
+# Virtualenv
 venv
+
+# Test file formats that are not needed in the code base
 *.test
+*.test.enc
