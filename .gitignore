@@ -13,22 +13,21 @@ venv
 *.test
 *.test.enc
 
-# 빌드 결과물
+# Build output
 build/
 dist/
 *.egg-info/
 
-# 로그 및 임시 파일
+# Log and temporary files
 *.log
 *.tmp
 *.swp
 
-
-# IDE 설정 파일
+# IDE configurations (VSCODE)
 .vscode/
 .idea/
 *.iml
 
-# 시스템 파일
+# System files
 .DS_Store
 Thumbs.db

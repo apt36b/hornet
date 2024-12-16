@@ -1,3 +1,6 @@
+# Fully attributed to github.com/llzo3
+#
+# Not an official part of the ransomware, but a script to decrypt files encrypted by the ransomware as an extra. 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from rich.console import Console
 import os
