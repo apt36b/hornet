@@ -1,9 +1,34 @@
 # Python cache
 __pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
 
 # Virtualenv
 venv
+.env
 
 # Test file formats that are not needed in the code base
 *.test
 *.test.enc
+
+# 빌드 결과물
+build/
+dist/
+*.egg-info/
+
+# 로그 및 임시 파일
+*.log
+*.tmp
+*.swp
+
+
+# IDE 설정 파일
+.vscode/
+.idea/
+*.iml
+
+# 시스템 파일
+.DS_Store
+Thumbs.db
